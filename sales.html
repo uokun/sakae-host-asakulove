@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>売上ランキング | 栄ホスト</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@700&family=Noto+Sans+JP:wght@700;900&display=swap');
+        
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px 40px;
+            /* ▼▼▼▼▼ 変更点1: フッター分の余白を一番下に追加 ▼▼▼▼▼ */
+            padding-bottom: 200px; 
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #e94560;
+            font-size: 2.5rem;
+            margin: 0;
+        }
+
+        .header a {
+            color: #8af;
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .ranking-container {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .ranking-item {
+            background-color: #16213e;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            border-left: 10px solid transparent;
+        }
+
+        .ranking-item.rank-1 { border-left-color: #ffd700; }
+        .ranking-item.rank-2 { border-left-color: #c0c0c0; }
+        .ranking-item.rank-3 { border-left-color: #cd7f32; }
+        .ranking-item.rank-other { border-left-color: #0f3460; }
+
+        .rank {
+            font-family: 'Roboto', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: #e94560;
+            width: 80px;
+        }
+
+        .name {
+            flex-grow: 1;
+            font-size: 2.5rem;
+            font-weight: 700;
+            padding: 0 30px;
+        }
+
+        .sales {
+            font-family: 'Roboto', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #50c878;
+            text-align: right;
+        }
+        .sales .unit {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 1.8rem;
+            margin-left: 10px;
+        }
+        .no-sales {
+            text-align: center;
+            font-size: 2rem;
+            margin-top: 50px;
+        }
+
+        /* ▼▼▼▼▼ 変更点2: フッターとして画面下に固定するためのスタイルに変更 ▼▼▼▼▼ */
+        .top-product-card {
+            position: fixed; /* 画面に固定 */
+            bottom: 0;       /* 一番下に配置 */
+            left: 0;         /* 左端に配置 */
+            width: 100%;     /* 幅を100%に */
+            box-sizing: border-box; /* paddingを含めて幅100%にする */
+
+            background-color: #16213e;
+            border-radius: 15px 15px 0 0; /* 上の角だけ丸くする */
+            padding: 20px 40px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.3); /* 影を上側に出す */
+            border-top: 5px solid #e94560;
+            display: none; 
+        }
+        .top-product-card h2 {
+            text-align: center;
+            color: #e94560;
+            font-size: 1.8rem;
+            margin: 0 0 15px 0;
+        }
+        .top-product-card .product-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .top-product-card .product-name {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        .top-product-card .product-count {
+            font-family: 'Roboto', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+        .top-product-card .unit {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 2rem;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>人別 売上ランキング</h1>
+        <a href="menu.html">メニューに戻る</a>
+    </div>
+
+    <ol class="ranking-container" id="host-ranking">
+        <!-- 人別ランキングがここに表示される -->
+    </ol>
+    
+    <div class="top-product-card" id="top-product-container">
+        <h2>商品売上 No.1</h2>
+        <div class="product-info">
+            <div class="product-name" id="top-product-name">--</div>
+            <div class="product-count" id="top-product-count">0<span class="unit">個</span></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (変更なし) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        // JavaScript部分は一切変更ありません
+        const firebaseConfig = {
+            apiKey: "AIzaSyABdNLXLt9eFECppeOo_rHS-V4N7z0Vjg0",
+            authDomain: "sakae-host-asakulove.firebaseapp.com",
+            projectId: "sakae-host-asakulove",
+            storageBucket: "sakae-host-asakulove.appspot.com",
+            messagingSenderId: "949047143177",
+            appId: "1:949047143177:web:a3ef7fcd1c505be920c1d8",
+            measurementId: "G-BCLM11PX1R"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const hostRankingEl = document.getElementById('host-ranking');
+        const topProductContainer = document.getElementById('top-product-container');
+        const topProductNameEl = document.getElementById('top-product-name');
+        const topProductCountEl = document.getElementById('top-product-count');
+        db.collection("orders")
+          .where("status", "==", "paid")
+          .onSnapshot((querySnapshot) => {
+            const hostSales = {};
+            const productSales = {};
+            querySnapshot.forEach((doc) => {
+                const order = doc.data();
+                const host = order.host;
+                const price = order.totalPrice;
+                if (hostSales[host]) {
+                    hostSales[host] += price;
+                } else {
+                    hostSales[host] = price;
+                }
+                order.items.forEach(item => {
+                    if (productSales[item.name]) {
+                        productSales[item.name] += item.quantity;
+                    } else {
+                        productSales[item.name] = item.quantity;
+                    }
+                });
+            });
+            hostRankingEl.innerHTML = '';
+            const sortedHosts = Object.entries(hostSales).sort((a, b) => b[1] - a[1]);
+            if(sortedHosts.length === 0){
+                hostRankingEl.innerHTML = '<li class="no-sales">まだ売上がありません</li>';
+            } else {
+                sortedHosts.forEach(([name, sales], index) => {
+                    const rank = index + 1;
+                    const listItem = document.createElement('li');
+                    let rankClass = (rank === 1) ? 'rank-1' : (rank === 2) ? 'rank-2' : (rank === 3) ? 'rank-3' : 'rank-other';
+                    listItem.className = `ranking-item ${rankClass}`;
+                    listItem.innerHTML = `<div class="rank">${rank}</div><div class="name">${name}</div><div class="sales">${sales.toLocaleString()}<span class="unit">円</span></div>`;
+                    hostRankingEl.appendChild(listItem);
+                });
+            }
+            const sortedProducts = Object.entries(productSales).sort((a, b) => b[1] - a[1]);
+            if (sortedProducts.length > 0) {
+                const topProduct = sortedProducts[0];
+                const topName = topProduct[0];
+                const topCount = topProduct[1];
+                topProductNameEl.textContent = topName;
+                topProductCountEl.innerHTML = `${topCount}<span class="unit">個</span>`;
+                topProductContainer.style.display = 'block';
+            } else {
+                topProductContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

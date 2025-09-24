@@ -1,0 +1,122 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会計 | 栄ホスト</title>
+    <style>
+        body { font-family: sans-serif; background-color: #e9f5ff; margin: 0; padding: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #bddcff; }
+        .header h1 { margin: 0; color: #0056b3; }
+        .header a { color: #007bff; text-decoration: none; }
+        .bills-container { display: flex; flex-wrap: wrap; gap: 20px; }
+        .bill-ticket { width: 320px; background-color: white; border: 1px solid #ccc; border-top: 5px solid #007bff; border-radius: 8px; padding: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
+        .bill-header { text-align: center; margin-bottom: 15px; }
+        .bill-header h3 { margin: 0; font-size: 1.5rem; }
+        .bill-items ul { list-style: none; padding: 0; margin: 0; }
+        .bill-items li { display: flex; justify-content: space-between; padding: 6px 0; }
+        .bill-items li .item-name { flex-grow: 1; }
+        .bill-items li .item-qty { margin-left: 10px; }
+        .bill-items li .item-price { min-width: 60px; text-align: right; }
+        .bill-footer { border-top: 2px dashed #999; margin-top: 15px; padding-top: 15px; }
+        .bill-footer .total-row { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; margin-bottom: 15px; }
+        .pay-button { width: 100%; padding: 12px; font-size: 1rem; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .pay-button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>会計待ちリスト</h1>
+        <a href="menu.html">メニューに戻る</a>
+    </div>
+
+    <div class="bills-container" id="bills-list">
+        <!-- ここに会計待ちの伝票が表示される -->
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script>
+        // --- Firebase設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyABdNLXLt9eFECppeOo_rHS-V4N7v0Vjg0",
+            authDomain: "sakae-host-asakulove.firebaseapp.com",
+            projectId: "sakae-host-asakulove",
+            storageBucket: "sakae-host-asakulove.appspot.com",
+            messagingSenderId: "949047143177",
+            appId: "1:949047143177:web:a3ef7fcd1c505be920c1d8",
+            measurementId: "G-BCLM11PX1R"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const billsList = document.getElementById('bills-list');
+
+        // --- 会計待ちの注文データをリアルタイムで監視 ---
+        // 'orders'コレクションの'status'が'served'（提供済）のものを監視
+        db.collection("orders")
+          .where("status", "==", "served")
+          .orderBy("createdAt", "asc")
+          .onSnapshot((querySnapshot) => {
+            billsList.innerHTML = ''; // 表示を一旦クリア
+            querySnapshot.forEach((doc) => {
+                const order = doc.data();
+                const orderId = doc.id;
+
+                const billTicket = document.createElement('div');
+                billTicket.className = 'bill-ticket';
+
+                let itemsHtml = '<ul>';
+                order.items.forEach(item => {
+                    itemsHtml += `
+    <li>
+        <span class="item-name">${item.name}</span>
+        <span class="item-qty">x${item.quantity}</span>
+        <span class="item-price">¥${item.price * item.quantity}</span>
+    </li>
+`;
+                });
+                itemsHtml += '</ul>';
+
+                // 注文時刻をフォーマット
+                const orderTime = order.createdAt.toDate().toLocaleTimeString('ja-JP');
+
+                billTicket.innerHTML = `
+    <div class="bill-header">
+        <h3>お会計</h3>
+        <small>担当: ${order.host} / ${orderTime}</small>
+    </div>
+    <div class="bill-items">${itemsHtml}</div>
+    <div class="bill-footer">
+        <div class="total-row">
+            <span>合計金額</span>
+            <span>¥${order.totalPrice}</span>
+        </div>
+        <button class="pay-button" onclick="completePayment('${orderId}')">会計完了</button>
+    </div>
+`;
+                billsList.appendChild(billTicket);
+            });
+        });
+
+        // --- 会計完了ボタンの処理 ---
+        function completePayment(orderId) {
+            if (confirm('このお会計を完了しますか？')) {
+                // Firestoreの該当ドキュメントのstatusを'paid'（支払済）に更新
+                db.collection("orders").doc(orderId).update({
+                    status: "paid"
+                })
+                .then(() => {
+                    console.log("会計が完了しました。");
+                })
+                .catch((error) => {
+                    console.error("更新に失敗しました: ", error);
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>

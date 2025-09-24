@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>レジ | 栄ホスト</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f6f8; margin: 0; display: flex; height: 100vh; }
+        .main-content { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; }
+        .header { background-color: white; padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header p { margin: 0; }
+        .header a { text-decoration: none; color: #007bff; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; overflow-y: auto; flex-grow: 1; }
+        .product-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .product-card h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
+        .product-card p { margin: 0; color: #555; font-weight: bold; }
+        .sidebar { width: 350px; background-color: white; padding: 20px; display: flex; flex-direction: column; box-shadow: -2px 0 5px rgba(0,0,0,0.1); }
+        .order-summary h2 { margin-top: 0; }
+        #order-items { list-style: none; padding: 0; flex-grow: 1; overflow-y: auto; }
+        #order-items li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+        .item-controls button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #ccc; background-color: #f0f0f0; cursor: pointer; }
+        .total-section { margin-top: auto; padding-top: 20px; border-top: 2px solid #333; }
+        .total-section h3 { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .confirm-button { width: 100%; padding: 15px; font-size: 1.2rem; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .confirm-button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <!-- 注文内容表示サイドバー -->
+    <div class="sidebar">
+        <div class="order-summary">
+            <h2>注文内容</h2>
+            <ul id="order-items">
+                <!-- 注文内容がここに追加される -->
+            </ul>
+        </div>
+        <div class="total-section">
+            <h3><span>合計</span><span id="total-price">\0</span></h3>
+            <button class="confirm-button" id="confirm-order-button">注文を確定する</button>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ（商品一覧） -->
+    <div class="main-content">
+        <div class="header">
+            <p><span id="login-user-name"></span> さんでログイン中</p>
+            <a href="menu.html">メニューに戻る</a>
+        </div>
+        <div class="product-grid" id="product-list">
+            <!-- Firestoreから商品がここに読み込まれる -->
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // --- Firebase設定 ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyABdNLXLt9eFECppeOo_rHS-V4N7v0Vjg0",
+            authDomain: "sakae-host-asakulove.firebaseapp.com",
+            projectId: "sakae-host-asakulove",
+            storageBucket: "sakae-host-asakulove.appspot.com",
+            messagingSenderId: "949047143177",
+            appId: "1:949047143177:web:a3ef7fcd1c505be920c1d8",
+            measurementId: "G-BCLM11PX1R"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- ログイン状態の確認 ---
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        if (loggedInUser) {
+            document.getElementById('login-user-name').textContent = loggedInUser;
+        } else {
+            alert('ログインしていません。ログインページに戻ります。');
+            window.location.href = 'index.html';
+        }
+
+        // --- 変数定義 ---
+        const productList = document.getElementById('product-list');
+        const orderItemsList = document.getElementById('order-items');
+        const totalPriceEl = document.getElementById('total-price');
+        let currentOrder = {}; // 現在の注文を保持するオブジェクト { productId: { name, price, quantity } }
+
+        // --- Firestoreから商品データを読み込んで表示 ---
+        db.collection("products").orderBy("order").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                const product = doc.data();
+                const productId = doc.id;
+                
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.dataset.id = productId;
+                card.dataset.name = product.name;
+                card.dataset.price = product.price;
+                card.innerHTML = `<h3>${product.name}</h3><p>¥${product.price}</p>`;
+                
+                // 商品カードがクリックされたら注文に追加
+                card.addEventListener('click', () => addToOrder(productId, product.name, product.price));
+                
+                productList.appendChild(card);
+            });
+        });
+
+        // --- 注文リストを更新する関数 ---
+        function updateOrderList() {
+            orderItemsList.innerHTML = '';
+            let totalPrice = 0;
+
+            for (const productId in currentOrder) {
+                const item = currentOrder[productId];
+                totalPrice += item.price * item.quantity;
+
+                const li = document.createElement('li');
+                li.innerHTML = `
+    <span>${item.name}</span>
+    <div class="item-controls">
+        <button onclick="changeQuantity('${productId}', -1)">-</button>
+        <span>${item.quantity}</span>
+        <button onclick="changeQuantity('${productId}', 1)">+</button>
+    </div>
+    <span>¥${item.price * item.quantity}</span>
+`;
+                orderItemsList.appendChild(li);
+            }
+            totalPriceEl.textContent = `¥${totalPrice}`;
+        }
+
+        // --- 注文に追加する関数 ---
+        function addToOrder(productId, name, price) {
+            if (currentOrder[productId]) {
+                currentOrder[productId].quantity++;
+            } else {
+                currentOrder[productId] = { name: name, price: price, quantity: 1 };
+            }
+            updateOrderList();
+        }
+
+        // --- 数量を変更する関数 ---
+        function changeQuantity(productId, amount) {
+            if (currentOrder[productId]) {
+                currentOrder[productId].quantity += amount;
+                if (currentOrder[productId].quantity <= 0) {
+                    delete currentOrder[productId]; // 数量が0以下になったら削除
+                }
+                updateOrderList();
+            }
+        }
+        
+        // --- 注文を確定する処理 ---
+        document.getElementById('confirm-order-button').addEventListener('click', () => {
+            const orderItems = Object.values(currentOrder);
+            if(orderItems.length === 0) {
+                alert('注文がありません。');
+                return;
+            }
+
+            const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+            // Firestoreに注文データを送信
+            db.collection("orders").add({
+                items: orderItems,
+                totalPrice: total,
+                status: "cooking", // cooking(調理中), served(提供済), paid(会計済)
+                host: loggedInUser,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            })
+            .then((docRef) => {
+                alert("注文を送信しました！");
+                // 注文内容をリセット
+                currentOrder = {};
+                updateOrderList();
+            })
+            .catch((error) => {
+                console.error("注文の送信に失敗しました: ", error);
+                alert("エラーが発生しました。もう一度お試しください。");
+            });
+        });
+    </script>
+
+</body>
+</html>

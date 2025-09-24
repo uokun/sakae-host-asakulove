@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン | 栄ホスト</title>
+    <style>
+        /* 簡単なスタイル */
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5; }
+        .login-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); text-align: center; }
+        h1 { color: #333; }
+        select, button { width: 100%; padding: 12px; margin-top: 1rem; border-radius: 4px; border: 1px solid #ccc; font-size: 1rem; }
+        button { background-color: #007bff; color: white; cursor: pointer; border: none; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>ログイン</h1>
+        <p>担当者名を選択してください</p>
+        <select id="user-select">
+            <option value="">読み込み中...</option>
+        </select>
+        <button id="login-button">ログイン</button>
+    </div>
+
+    <!-- Firebase SDK の読み込み -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // ▼▼▼▼▼ あなたのFirebaseプロジェクトの設定情報 ▼▼▼▼▼
+        const firebaseConfig = {
+            apiKey: "AIzaSyABdNLXLt9eFECppeOo_rHS-V4N7v0Vjg0",
+            authDomain: "sakae-host-asakulove.firebaseapp.com",
+            projectId: "sakae-host-asakulove",
+            storageBucket: "sakae-host-asakulove.appspot.com",
+            messagingSenderId: "949047143177",
+            appId: "1:949047143177:web:a3ef7fcd1c505be920c1d8",
+            measurementId: "G-BCLM11PX1R"
+        };
+        // ▲▲▲▲▲ あなたのFirebaseプロジェクトの設定情報 ▲▲▲▲▲
+
+        // Firebaseを初期化
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // --- 担当者リストをFirestoreから取得してプルダウンに表示 ---
+        const userSelect = document.getElementById('user-select');
+
+        // usersコレクションのデータを取得
+        db.collection("users").get().then((querySnapshot) => {
+            userSelect.innerHTML = '<option value="">選択してください</option>'; // 初期表示をクリア
+            querySnapshot.forEach((doc) => {
+                // ドキュメントのIDと名前を取得
+                const userId = doc.id;
+                const userName = doc.data().name;
+                
+                // プルダウンの選択肢を作成
+                const option = document.createElement('option');
+                option.value = userName; // valueに名前を格納
+                option.textContent = userName;
+                userSelect.appendChild(option);
+            });
+        }).catch((error) => {
+            console.error("ユーザーリストの読み込みに失敗しました:", error);
+            userSelect.innerHTML = '<option value="">読み込み失敗</option>';
+        });
+
+
+        // --- ログインボタンが押されたときの処理 ---
+        const loginButton = document.getElementById('login-button');
+
+        loginButton.addEventListener('click', () => {
+            const selectedUserName = userSelect.value;
+            
+            if (!selectedUserName) {
+                alert('担当者を選択してください。');
+                return;
+            }
+
+            // 選ばれた担当者名をセッションストレージに保存
+            // ※セッションストレージはブラウザを閉じると消える一時的な保存場所
+            sessionStorage.setItem('loggedInUser', selectedUserName);
+            
+            // 各ページへのリンクを持つメニューページに遷移する（仮に menu.html とします）
+            alert(selectedUserName + 'さんとしてログインしました！');
+            window.location.href = 'menu.html'; // 次のページへ
+        });
+    </script>
+
+</body>
+</html>

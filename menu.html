@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メニュー | 栄ホスト</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .header { background-color: white; padding: 10px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header p { margin: 0; font-size: 1.1rem; }
+        .header a { text-decoration: none; color: #007bff; }
+        .menu-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .menu-item { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; text-decoration: none; color: #333; transition: transform 0.2s; }
+        .menu-item:hover { transform: translateY(-5px); box-shadow: 0 6px 16px rgba(0,0,0,0.15); }
+        .menu-item h2 { margin-top: 0; color: #007bff; }
+        .menu-item p { color: #666; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <p><span id="login-user-name"></span> さんでログイン中</p>
+        <a href="index.html" id="logout-button">ログアウト</a>
+    </div>
+
+    <h1>メインメニュー</h1>
+
+    <div class="menu-container">
+        <a href="pos.html" class="menu-item">
+            <h2>レジ (注文)</h2>
+            <p>お客様の注文を入力します。</p>
+        </a>
+        <a href="kitchen.html" class="menu-item">
+            <h2>キッチン</h2>
+            <p>注文を確認して調理します。</p>
+        </a>
+        <a href="accounting.html" class="menu-item">
+            <h2>会計</h2>
+            <p>お客様のお会計を処理します。</p>
+        </a>
+        <a href="sales.html" class="menu-item">
+            <h2>売上表示</h2>
+            <p>現在の売上状況を確認します。</p>
+        </a>
+    </div>
+
+    <script>
+        // --- ログインしているユーザー名を表示 ---
+        const loggedInUser = sessionStorage.getItem('loggedInUser');
+        const userNameDisplay = document.getElementById('login-user-name');
+
+        if (loggedInUser) {
+            // ログイン情報があれば、名前を表示
+            userNameDisplay.textContent = loggedInUser;
+        } else {
+            // ログイン情報がなければ、ログインページに戻す
+            alert('ログインしていません。ログインページに戻ります。');
+            window.location.href = 'index.html';
+        }
+
+        // --- ログアウト処理 ---
+        const logoutButton = document.getElementById('logout-button');
+        logoutButton.addEventListener('click', (event) => {
+            // 確認ダイアログを表示
+            if (confirm('ログアウトしますか？')) {
+                // セッションストレージからログイン情報を削除
+                sessionStorage.removeItem('loggedInUser');
+                // index.htmlへ移動
+                window.location.href = 'index.html';
+            }
+            // aタグのデフォルトのページ遷移をキャンセル
+            event.preventDefault(); 
+        });
+    </script>
+
+</body>
+</html>
