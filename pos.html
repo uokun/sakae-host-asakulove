@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -165,7 +165,7 @@
             db.collection("orders").add({
                 items: orderItems,
                 totalPrice: total,
-                status: "cooking", // cooking(調理中), served(提供済), paid(会計済)
+                status: "awaiting_payment", // 新しいステータス「会計待ち」
                 host: loggedInUser,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             })
