@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -89,11 +89,11 @@
         });
 
         // --- 調理完了ボタンの処理 ---
-        function completeOrder(orderId) {
-            if (confirm('この注文を完了しますか？')) {
-                // Firestoreの該当ドキュメントのstatusを'served'（提供済）に更新
+               function completeOrder(orderId) {
+            if (confirm('この注文の調理を完了し、お客様へ提供しますか？')) { // メッセージも変更
+                // Firestoreの該当ドキュメントのstatusを'paid'（支払済＝売上計上済）に更新
                 db.collection("orders").doc(orderId).update({
-                    status: "served"
+                    status: "paid" // 調理完了で最終的な売上に計上
                 })
                 .then(() => {
                     console.log("注文が完了しました！");
