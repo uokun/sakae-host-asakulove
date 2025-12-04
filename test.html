@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保健体育 テスト対策クイズ</title>
+<style>
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background-color: #f0f4f8;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: #fff;
+    width: 90%;
+    max-width: 600px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #007bff;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eef;
+    padding-bottom: 10px;
+  }
+  .question-box {
+    margin-bottom: 20px;
+  }
+  .question-text {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  button {
+    background: #eef2f5;
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+  }
+  button:hover {
+    background: #dce4eb;
+  }
+  button.correct {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+  }
+  button.wrong {
+    background: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  .result-msg {
+    margin-top: 15px;
+    font-weight: bold;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+  }
+  .explanation {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 5px;
+  }
+  .nav-btn {
+    margin-top: 20px;
+    width: 100%;
+    background: #007bff;
+    color: white;
+    text-align: center;
+    border: none;
+  }
+  .nav-btn:hover {
+    background: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>保健体育 試験対策問題</h1>
+  <div id="quiz-container">
+    <div class="question-box">
+      <div id="question-text" class="question-text">ここに問題が表示されます</div>
+      <div id="options" class="options"></div>
+    </div>
+    <div id="result-msg" class="result-msg"></div>
+    <button id="next-btn" class="nav-btn" style="display:none;" onclick="nextQuestion()">次の問題へ</button>
+  </div>
+</div>
+
+<script>
+// プリントの内容に基づいた問題データ
+const questions = [
+  {
+    q: "感染してから症状が出るまでの期間を何というか？",
+    options: ["潜伏期間", "治療期間", "免疫期間", "隔離期間"],
+    a: 0,
+    note: "「感染＝発症」ではありません。ウイルスが増殖するまでの時間を潜伏期間といいます。"
+  },
+  {
+    q: "かつて減少し制圧されたかに見えたが、再び流行し始めた感染症（結核など）を何というか？",
+    options: ["新興感染症", "再興感染症", "生活習慣病", "日和見感染"],
+    a: 1,
+    note: "新興感染症は新しく発見されたもの（COVID-19など）。再興感染症は再び増え始めたものです。"
+  },
+  {
+    q: "治療の過程で、薬が効かなくなってしまった菌のことを何というか？",
+    options: ["病原性細菌", "薬剤耐性菌", "常在菌", "獲得免疫菌"],
+    a: 1,
+    note: "薬を正しく飲みきらないと、生き残った菌が薬に強くなり「薬剤耐性菌」になることがあります。"
+  },
+  {
+    q: "感染症予防の3原則のうち、消毒や殺菌などで病原体をなくす対策はどれか？",
+    options: ["感染源対策", "感染経路対策", "感受性対策", "免疫対策"],
+    a: 0,
+    note: "手洗いやマスクは「経路対策」、予防接種は「感受性対策」です。"
+  },
+  {
+    q: "HIV（エイズウイルス）が破壊する、免疫の司令塔となる細胞はどれか？",
+    options: ["赤血球", "ヘルパーT細胞", "血小板", "B細胞"],
+    a: 1,
+    note: "ヘルパーT細胞が壊されると、普段なら何ともない弱い菌で病気になる（日和見感染）状態になります。"
+  },
+  {
+    q: "エイズの感染経路として正しくない（感染しない）ものはどれか？",
+    options: ["性行為", "血液感染", "母子感染", "蚊に刺される"],
+    a: 3,
+    note: "エイズは、蚊、握手、咳、プール、同じ食器の使用などでは感染しません。"
+  },
+  {
+    q: "生活習慣病の予防のうち、早期発見・早期治療（健康診断など）を何というか？",
+    options: ["一次予防", "二次予防", "三次予防", "四次予防"],
+    a: 1,
+    note: "一次予防は発病防止（運動・食事）、三次予防はリハビリ・社会復帰です。"
+  },
+  {
+    q: "健康づくりのために、1日に摂取することが目標とされている野菜の量は？",
+    options: ["100g", "280g", "350g", "500g"],
+    a: 2,
+    note: "現在の平均は約280gで不足しており、「プラス一皿（約70g）」で350gを目指すのが目標です。"
+  }
+];
+
+let currentQIndex = 0;
+let isAnswered = false;
+
+function renderQuestion() {
+  isAnswered = false;
+  const qData = questions[currentQIndex];
+  document.getElementById("question-text").textContent = `Q${currentQIndex + 1}. ${qData.q}`;
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+  document.getElementById("result-msg").style.display = "none";
+  document.getElementById("next-btn").style.display = "none";
+
+  qData.options.forEach((opt, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(index, btn);
+    optionsDiv.appendChild(btn);
+  });
+}
+
+function checkAnswer(selectedIndex, btnElement) {
+  if (isAnswered) return;
+  isAnswered = true;
+  const qData = questions[currentQIndex];
+  const resultMsg = document.getElementById("result-msg");
+  
+  const buttons = document.querySelectorAll(".options button");
+  buttons[qData.a].classList.add("correct"); // 正解を表示
+
+  if (selectedIndex === qData.a) {
+    btnElement.classList.add("correct");
+    resultMsg.innerHTML = `<div style="color:green">◎ 正解！</div><div class="explanation">${qData.note}</div>`;
+  } else {
+    btnElement.classList.add("wrong");
+    resultMsg.innerHTML = `<div style="color:red">× 不正解...</div><div class="explanation">正解は「${qData.options[qData.a]}」です。<br>${qData.note}</div>`;
+  }
+  
+  resultMsg.style.display = "block";
+  
+  // 最後の問題でなければ「次へ」ボタンを表示
+  if (currentQIndex < questions.length - 1) {
+    document.getElementById("next-btn").style.display = "block";
+  } else {
+    const finishBtn = document.getElementById("next-btn");
+    finishBtn.textContent = "最初からやり直す";
+    finishBtn.onclick = () => location.reload();
+    finishBtn.style.display = "block";
+  }
+}
+
+function nextQuestion() {
+  currentQIndex++;
+  renderQuestion();
+}
+
+// 初期表示
+renderQuestion();
+
+</script>
+</body>
+</html>
