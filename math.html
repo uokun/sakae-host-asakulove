@@ -3,331 +3,468 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数学I 解き方確認クイズ</title>
+    <title>数学I 解法ステップマスター</title>
     <style>
         body {
             font-family: "Helvetica Neue", Arial, sans-serif;
-            background-color: #f0f4f8;
+            background-color: #f0f2f5;
             color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
             padding: 20px;
+            margin: 0;
+            min-height: 100vh;
         }
         h1 {
             color: #2c3e50;
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-bottom: 20px;
             text-align: center;
         }
-        .quiz-container {
+        .app-container {
             background: white;
             width: 100%;
             max-width: 600px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             position: relative;
-            min-height: 400px;
         }
-        .category-badge {
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            background-color: #3498db;
+        .header-bar {
+            background-color: #34495e;
             color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
         }
         .question-area {
-            padding: 60px 30px 30px;
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #2c3e50;
-            border-bottom: 2px dashed #eee;
+            padding: 25px 20px;
+            border-bottom: 1px solid #eee;
         }
-        .answer-area {
-            background-color: #fcfcfc;
-            padding: 30px;
-            display: none; /* 初期状態は非表示 */
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        .answer-area.show {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-        .answer-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #e74c3c;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        .answer-detail {
-            font-size: 0.95rem;
-            color: #555;
-            text-align: left;
-            width: 100%;
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-        }
-        .btn-container {
-            padding: 20px;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            background: white;
-        }
-        button {
-            border: none;
-            padding: 15px 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: transform 0.1s, background 0.2s;
-            width: 100%;
-            max-width: 250px;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        #show-btn {
+        .step-badge {
+            display: inline-block;
             background-color: #3498db;
             color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
-        #show-btn:hover {
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .sub-text {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 15px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+        .options-area {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .option-btn:hover {
+            border-color: #3498db;
+            background-color: #f0f8ff;
+        }
+        .option-btn.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .option-btn.wrong {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .feedback-area {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: none; /* 初期は非表示 */
+        }
+        .feedback-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .feedback-text {
+            font-size: 0.95rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .next-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            float: right;
+            transition: background 0.2s;
+        }
+        .next-btn:hover {
             background-color: #2980b9;
         }
-        #next-btn {
-            background-color: #2ecc71;
-            color: white;
+
+        /* 完了画面 */
+        .result-screen {
+            text-align: center;
+            padding: 40px;
             display: none;
         }
-        #next-btn:hover {
-            background-color: #27ae60;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .progress {
-            margin-top: 10px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
+        .result-score {
+            font-size: 2rem;
+            color: #3498db;
+            font-weight: bold;
+            margin: 20px 0;
         }
     </style>
 </head>
 <body>
 
-    <h1>数学I 解き方・手順クイズ</h1>
+    <h1>数学I 解法ステップマスター</h1>
 
-    <div class="quiz-container">
-        <div class="category-badge" id="category">カテゴリ</div>
-        
-        <div class="question-area" id="question">
-            ここに問題が表示されます
+    <div class="app-container" id="quiz-app">
+        <!-- ヘッダー -->
+        <div class="header-bar">
+            <span id="progress-text">Q 1 / 5</span>
+            <span id="score-text">Score: 0</span>
         </div>
 
-        <div class="answer-area" id="answer-area">
-            <div class="answer-text" id="answer-main">ここに答えの核が表示されます</div>
-            <div class="answer-detail" id="answer-sub">ここに詳しい手順が表示されます</div>
+        <!-- 問題表示エリア -->
+        <div class="question-area">
+            <div id="step-badge" class="step-badge" style="display:none;">STEP 1</div>
+            <div id="question-text" class="question-text">ここに問題文が表示されます</div>
+            <div id="sub-text" class="sub-text" style="display:none;"></div>
         </div>
 
-        <div class="btn-container">
-            <button id="show-btn">答えを見る</button>
-            <button id="next-btn">次の問題へ</button>
+        <!-- 選択肢エリア -->
+        <div class="options-area" id="options-container">
+            <!-- ボタンがJSで生成されます -->
+        </div>
+
+        <!-- 解説・次へエリア -->
+        <div class="feedback-area" id="feedback-area">
+            <div class="feedback-title" id="feedback-title">正解！</div>
+            <div class="feedback-text" id="feedback-desc">解説がここに入ります。</div>
+            <button class="next-btn" id="next-btn">次へ進む</button>
+        </div>
+
+        <!-- 結果画面（隠し） -->
+        <div class="result-screen" id="result-screen">
+            <h2>全問終了！</h2>
+            <div class="result-score" id="final-score"></div>
+            <p>手順を意識して解けるようになりましたか？</p>
+            <button class="next-btn" onclick="location.reload()">もう一度挑戦</button>
         </div>
     </div>
 
-    <div class="progress" id="counter">第 1 問</div>
-
     <script>
-        // クイズデータ（解き方の確認）
+        // 問題データ
+        // type: 'single' (一問一答) または 'multi' (ステップ式)
         const quizData = [
-            // --- 2次関数 (基本・決定) ---
+            // --- 問1: 3点を通る2次関数 (ステップ式) ---
             {
-                category: "2次関数の決定",
-                question: "「頂点が(2, -1)で...」という問題。<br>どの式に代入してスタートする？",
-                answer: "y = a(x - p)² + q",
-                detail: "頂点 (p, q) がわかっている時は基本形を使います。<br>式を <strong>y = a(x - 2)² - 1</strong> と置いて、通る点の座標を代入して a を求めます。"
-            },
-            {
-                category: "2次関数の決定",
-                question: "「3点 (1,2), (3,5), (-1,4) を通る...」という問題。<br>どの式を使う？",
-                answer: "y = ax² + bx + c",
-                detail: "頂点や軸の情報がない時は一般形を使います。<br>3つの点をすべて代入して、a, b, c の連立方程式（3文字）を作って解きます。"
-            },
-            {
-                category: "2次関数の決定",
-                question: "a, b, c の連立方程式。<br>一番最初に消去すべき文字はどれ？",
-                answer: "文字 c を消す！",
-                detail: "c は係数が全部 1 なので一番消しやすいです。<br>(1)-(2) と (2)-(3) の引き算をして、aとbだけの式を2つ作るのが鉄則です。"
-            },
-            
-            // --- 2次方程式・判別式 ---
-            {
-                category: "2次方程式",
-                question: "「方程式が重解をもつとき...」<br>計算すべき式は？",
-                answer: "判別式 D = 0",
-                detail: "D = b² - 4ac を計算して、それが <strong>= 0</strong> になるように方程式を立てます。"
-            },
-            {
-                category: "2次方程式",
-                question: "「x軸との共有点の個数を求めよ」<br>何をする？",
-                answer: "判別式 D の符号（プラス・マイナス）を調べる",
-                detail: "方程式を解く必要はありません。<br>・D > 0 なら 2個<br>・D = 0 なら 1個<br>・D < 0 なら 0個"
-            },
-            {
-                category: "2次方程式",
-                question: "「x軸と共有点をもたないとき」<br>Dの条件は？",
-                answer: "D < 0",
-                detail: "解がない（交わらない）ので、判別式はマイナスになります。"
+                type: 'multi',
+                title: "3点 (2,-2), (3,5), (-1,1) を通る2次関数を求めよ",
+                steps: [
+                    {
+                        question: "まず、どの公式を使うべき？",
+                        options: [
+                            "y = a(x - p)² + q （基本形）",
+                            "y = ax² + bx + c （一般形）"
+                        ],
+                        correct: 1,
+                        explanation: "頂点や軸がわからない時は、一般形 y = ax² + bx + c を使います。"
+                    },
+                    {
+                        question: "3点を代入して連立方程式を作りました。<br>① 4a+2b+c = -2<br>② 9a+3b+c = 5<br>③ a-b+c = 1<br>次にどう計算する？",
+                        options: [
+                            "式を足し算して a を消去する",
+                            "引き算(②-①, ①-③など)をして c を消去する",
+                            "適当に代入して運に任せる"
+                        ],
+                        correct: 1,
+                        explanation: "c の係数はすべて1なので、引き算をすれば簡単に c を消せます。これでaとbの連立方程式に持ち込みます。"
+                    },
+                    {
+                        question: "計算の結果、a=2, b=-3, c=-4 となりました。<br>最終的な答えは？",
+                        options: [
+                            "y = 2x² - 3x - 4",
+                            "x = 2, -3, -4",
+                            "y = 2(x-3)² - 4"
+                        ],
+                        correct: 0,
+                        explanation: "一般形に戻します。答えは y = 2x² - 3x - 4 です。"
+                    }
+                ]
             },
 
-            // --- グラフとx軸 ---
+            // --- 問2: 不等式（マイナス係数） (ステップ式) ---
             {
-                category: "グラフ",
-                question: "「放物線と直線の共有点の座標」<br>最初のステップは？",
-                answer: "右辺同士をイコールで結ぶ",
-                detail: "放物線の式 ＝ 直線の式 という形を作ります。<br>全部左辺に移項して2次方程式を解けば、交点のx座標が出ます。"
-            },
-            {
-                category: "グラフ",
-                question: "「x軸に接する放物線を選べ」<br>どうやって見分ける？",
-                answer: "2次方程式の解が「重解（1つ）」になるもの",
-                detail: "(x+○)² = 0 の形に変形できるものが「接する」グラフです。<br>判別式 D = 0 になるものを選んでもOKです。"
-            },
-
-            // --- 2次不等式 ---
-            {
-                category: "2次不等式",
-                question: "-x² + 4x + 5 > 0 <br>一番最初にやることは？",
-                answer: "両辺に -1 を掛けて不等号を逆にする！",
-                detail: "x² の前にあるマイナスは計算ミスの元です。<br><strong>x² - 4x - 5 < 0</strong> に直してから解きます。"
-            },
-            {
-                category: "2次不等式",
-                question: "(x - 1)(x - 3) > 0 <br>解の範囲は「内側」？「外側」？",
-                answer: "外側",
-                detail: "式 > 0 （大きい）ときは、解の外側になります。<br>答え： x < 1,  3 < x"
-            },
-            {
-                category: "2次不等式",
-                question: "(x - 2)² ≦ 0 <br>これの解はどうなる？",
-                answer: "x = 2 だけ",
-                detail: "2乗して0以下になるのは、0になる瞬間しかありません。<br>よって x=2 の一点のみが答えです。"
-            },
-            {
-                category: "2次不等式",
-                question: "すべての実数 x で成り立つ条件<br>（グラフが常に浮いている）",
-                answer: "D < 0",
-                detail: "「常に成り立つ」＝「x軸と交わらない」ということ。<br>交わらないので判別式 D はマイナスになります。"
+                type: 'multi',
+                title: "2次不等式 -2x² + x + 1 < 0 を解け",
+                steps: [
+                    {
+                        question: "一番最初にやるべき操作は？",
+                        options: [
+                            "そのまま因数分解を始める",
+                            "判別式 D を計算する",
+                            "両辺に -1 を掛けて符号を逆にする"
+                        ],
+                        correct: 2,
+                        explanation: "x² の係数がマイナスのままだと間違いやすいです。<br>全体に-1を掛けます。不等号の向きが逆になる(>)ことに注意！"
+                    },
+                    {
+                        question: "式は 2x² - x - 1 > 0 になりました。<br>左辺を因数分解すると？",
+                        options: [
+                            "(2x - 1)(x + 1)",
+                            "(2x + 1)(x - 1)",
+                            "(x - 1)²"
+                        ],
+                        correct: 1,
+                        explanation: "たすき掛けを使います。<br>2x² → 2x と x<br>-1 → +1 と -1<br>斜めに掛けて足すと -x になります。"
+                    },
+                    {
+                        question: "(2x + 1)(x - 1) > 0 を解くと？<br>（ヒント：不等号は > なので外側）",
+                        options: [
+                            "-1/2 < x < 1",
+                            "x < -1/2,  1 < x",
+                            "x < -1,  1/2 < x"
+                        ],
+                        correct: 1,
+                        explanation: "式 > 0 のときは「小さい解より小さい、大きい解より大きい」となります。<br>境界値は -1/2 と 1 です。"
+                    }
+                ]
             },
 
-            // --- 三角比 ---
+            // --- 問3: 三角比の基本 (一問一答) ---
             {
-                category: "三角比",
-                question: "直角三角形の斜辺と「底辺」を使う三角比は？<br>（sin, cos, tan のどれ？）",
-                answer: "cos (コサイン)",
-                detail: "cos θ = 底辺 / 斜辺 です。<br>斜辺と底辺で挟むように C を書くのが覚え方です。"
+                type: 'single',
+                title: "三角比の選択",
+                question: "ビルの「高さ」を知りたい。わかっているのは水平距離と見上げた角度。<br>sin, cos, tan のどれを使う？",
+                options: [
+                    "sin (サイン)",
+                    "cos (コサイン)",
+                    "tan (タンジェント)"
+                ],
+                correct: 2,
+                explanation: "高さ / 水平距離 = tanθ です。<br>「底辺」と「高さ」の関係なので tan を使います。"
             },
+
+            // --- 問4: 2次方程式の判別式 (ステップ式) ---
             {
-                category: "三角比",
-                question: "「ある地点からビルの頂上を見上げた」<br>高さを求める時に使うのは？",
-                answer: "tan (タンジェント)",
-                detail: "水平距離と高さの関係なので tan を使います。<br>高さ = 水平距離 × tanθ"
+                type: 'multi',
+                title: "x² + (m+2)x + m+5 = 0 が重解をもつ条件",
+                steps: [
+                    {
+                        question: "「重解をもつ」ための条件式は？",
+                        options: [
+                            "判別式 D > 0",
+                            "判別式 D = 0",
+                            "判別式 D < 0"
+                        ],
+                        correct: 1,
+                        explanation: "重解（解が1つ）の条件は D = 0 です。"
+                    },
+                    {
+                        question: "D = (m+2)² - 4(m+5) = 0 を整理すると m² - 16 = 0 になりました。<br>mの値は？",
+                        options: [
+                            "m = 4",
+                            "m = 16",
+                            "m = ±4"
+                        ],
+                        correct: 2,
+                        explanation: "m² = 16 なので、m = 4 と m = -4 の両方が答えです。"
+                    }
+                ]
             },
+
+            // --- 問5: x軸との位置関係 (一問一答) ---
             {
-                category: "三角比",
-                question: "目の高さがある問題で、最後に忘れてはいけないことは？",
-                answer: "計算結果に「目の高さ」を足す！",
-                detail: "tanで求まるのは「目から上」の高さだけです。<br>最後に身長（目の高さ）を足さないと正解になりません。"
+                type: 'single',
+                title: "放物線とx軸",
+                question: "2次関数 y = x² + 3x + 5 とx軸の共有点の個数は？<br>(判別式 D = 9 - 20 を計算しよう)",
+                options: [
+                    "2個",
+                    "1個",
+                    "0個"
+                ],
+                correct: 2,
+                explanation: "D = -11 となり、マイナス（負）です。<br>D < 0 のとき、x軸とは交わりません（共有点0個）。"
             }
         ];
 
-        // 変数
+        // 状態管理
         let currentQuizIndex = 0;
-        let shuffledQuiz = [];
+        let currentStepIndex = 0;
+        let score = 0;
+        let isStepMode = false;
 
-        // 要素の取得
-        const categoryEl = document.getElementById("category");
-        const questionEl = document.getElementById("question");
-        const answerArea = document.getElementById("answer-area");
-        const answerMain = document.getElementById("answer-main");
-        const answerSub = document.getElementById("answer-sub");
-        const showBtn = document.getElementById("show-btn");
+        // HTML要素
+        const questionText = document.getElementById("question-text");
+        const subText = document.getElementById("sub-text");
+        const optionsContainer = document.getElementById("options-container");
+        const feedbackArea = document.getElementById("feedback-area");
+        const feedbackTitle = document.getElementById("feedback-title");
+        const feedbackDesc = document.getElementById("feedback-desc");
         const nextBtn = document.getElementById("next-btn");
-        const counterEl = document.getElementById("counter");
+        const stepBadge = document.getElementById("step-badge");
+        const progressText = document.getElementById("progress-text");
+        const scoreText = document.getElementById("score-text");
+        const quizApp = document.getElementById("quiz-app"); // 全体コンテナ
+        const resultScreen = document.getElementById("result-screen");
 
-        // シャッフル関数
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        // クイズ初期化
+        // 初期化
         function initQuiz() {
-            shuffledQuiz = shuffle([...quizData]); // データをコピーしてシャッフル
-            currentQuizIndex = 0;
-            showQuestion();
+            renderQuestion();
         }
 
-        // 問題表示
-        function showQuestion() {
-            const data = shuffledQuiz[currentQuizIndex];
+        // 問題描画
+        function renderQuestion() {
+            const quiz = quizData[currentQuizIndex];
             
-            // 表示リセット
-            answerArea.classList.remove("show");
-            showBtn.style.display = "inline-block";
-            nextBtn.style.display = "none";
+            // UIリセット
+            optionsContainer.innerHTML = "";
+            feedbackArea.style.display = "none";
+            subText.style.display = "none";
+            stepBadge.style.display = "none";
             
-            // 内容セット
-            categoryEl.textContent = data.category;
-            questionEl.innerHTML = data.question;
-            answerMain.textContent = data.answer;
-            answerSub.innerHTML = data.detail;
-            counterEl.textContent = `第 ${currentQuizIndex + 1} 問 / 全 ${quizData.length} 問`;
-        }
+            progressText.innerText = `Q ${currentQuizIndex + 1} / ${quizData.length}`;
 
-        // ボタンイベント
-        showBtn.addEventListener("click", () => {
-            answerArea.classList.add("show");
-            showBtn.style.display = "none";
-            nextBtn.style.display = "inline-block";
-        });
+            if (quiz.type === 'single') {
+                // 一問一答モード
+                isStepMode = false;
+                questionText.innerHTML = quiz.title;
+                subText.innerHTML = quiz.question;
+                subText.style.display = "block";
+                createOptions(quiz.options, quiz.correct, quiz.explanation);
 
-        nextBtn.addEventListener("click", () => {
-            currentQuizIndex++;
-            if (currentQuizIndex < shuffledQuiz.length) {
-                showQuestion();
             } else {
-                // 一周終了
-                if(confirm("全問終了！もう一度シャッフルしてやりますか？")) {
-                    initQuiz();
-                }
+                // ステップモード
+                isStepMode = true;
+                const step = quiz.steps[currentStepIndex];
+                
+                stepBadge.style.display = "inline-block";
+                stepBadge.innerText = `STEP ${currentStepIndex + 1}`;
+                
+                questionText.innerHTML = quiz.title;
+                subText.innerHTML = step.question;
+                subText.style.display = "block";
+                
+                createOptions(step.options, step.correct, step.explanation);
             }
-        });
+        }
 
-        // 開始
+        // 選択肢ボタン生成
+        function createOptions(options, correctIndex, explanation) {
+            options.forEach((optText, index) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.innerHTML = optText;
+                btn.onclick = () => checkAnswer(btn, index, correctIndex, explanation);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // 正誤判定
+        function checkAnswer(btn, index, correctIndex, explanation) {
+            // すべてのボタンを無効化
+            const allBtns = optionsContainer.querySelectorAll(".option-btn");
+            allBtns.forEach(b => b.disabled = true);
+
+            if (index === correctIndex) {
+                // 正解
+                btn.classList.add("correct");
+                feedbackTitle.innerText = "正解！";
+                feedbackTitle.style.color = "#28a745";
+                score++;
+                scoreText.innerText = `Score: ${score}`;
+            } else {
+                // 不正解
+                btn.classList.add("wrong");
+                // 正解のボタンを強調表示
+                allBtns[correctIndex].classList.add("correct");
+                feedbackTitle.innerText = "惜しい！";
+                feedbackTitle.style.color = "#dc3545";
+            }
+
+            feedbackDesc.innerHTML = explanation;
+            feedbackArea.style.display = "block";
+        }
+
+        // 次へボタンの処理
+        nextBtn.onclick = () => {
+            const quiz = quizData[currentQuizIndex];
+
+            if (isStepMode) {
+                // ステップモードの場合
+                if (currentStepIndex < quiz.steps.length - 1) {
+                    // まだステップが残っている
+                    currentStepIndex++;
+                    renderQuestion();
+                } else {
+                    // 全ステップ完了 -> 次の問題へ
+                    goToNextQuestion();
+                }
+            } else {
+                // 一問一答の場合 -> 次の問題へ
+                goToNextQuestion();
+            }
+        };
+
+        function goToNextQuestion() {
+            currentQuizIndex++;
+            currentStepIndex = 0; // ステップリセット
+
+            if (currentQuizIndex < quizData.length) {
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            // クイズ画面を隠して結果を表示
+            document.querySelector(".header-bar").style.display = "none";
+            document.querySelector(".question-area").style.display = "none";
+            document.querySelector(".options-area").style.display = "none";
+            document.querySelector(".feedback-area").style.display = "none";
+            
+            resultScreen.style.display = "block";
+            document.getElementById("final-score").innerText = `${score} 点`;
+        }
+
+        // スタート
         initQuiz();
 
     </script>
