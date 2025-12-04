@@ -3,102 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>保健体育 テスト対策クイズ</title>
+<title>保健体育 テスト対策クイズ完全版</title>
 <style>
   body {
     font-family: "Helvetica Neue", Arial, sans-serif;
-    background-color: #f0f4f8;
+    background-color: #f4f7f6;
     color: #333;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    padding: 10px;
   }
   .container {
     background: #fff;
-    width: 90%;
+    width: 100%;
     max-width: 600px;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
   }
   h1 {
     text-align: center;
-    font-size: 1.2rem;
-    color: #007bff;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #eef;
+    font-size: 1.4rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    border-bottom: 3px solid #3498db;
     padding-bottom: 10px;
+  }
+  .progress {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 15px;
   }
   .question-box {
     margin-bottom: 20px;
   }
   .question-text {
     font-weight: bold;
-    font-size: 1.1rem;
-    margin-bottom: 15px;
+    font-size: 1.15rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
   }
   .options {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
   }
   button {
-    background: #eef2f5;
-    border: 1px solid #ccc;
-    padding: 12px;
-    border-radius: 8px;
+    background: #fff;
+    border: 2px solid #e0e0e0;
+    padding: 15px;
+    border-radius: 10px;
     font-size: 1rem;
     cursor: pointer;
     text-align: left;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    color: #444;
   }
   button:hover {
-    background: #dce4eb;
+    background: #f0f8ff;
+    border-color: #3498db;
   }
   button.correct {
     background: #d4edda;
-    border-color: #c3e6cb;
+    border-color: #28a745;
     color: #155724;
+    font-weight: bold;
   }
   button.wrong {
     background: #f8d7da;
-    border-color: #f5c6cb;
+    border-color: #dc3545;
     color: #721c24;
+    opacity: 0.7;
   }
   .result-msg {
-    margin-top: 15px;
-    font-weight: bold;
-    padding: 10px;
-    border-radius: 5px;
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    border-left: 5px solid #ccc;
     display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .result-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
   }
   .explanation {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: #555;
-    margin-top: 5px;
+    line-height: 1.6;
   }
   .nav-btn {
-    margin-top: 20px;
+    margin-top: 25px;
     width: 100%;
-    background: #007bff;
+    padding: 15px;
+    background: #3498db;
     color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
     text-align: center;
     border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   }
   .nav-btn:hover {
-    background: #0056b3;
+    background: #2980b9;
+    transform: translateY(-2px);
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>保健体育 試験対策問題</h1>
+  <h1>保健体育 試験対策（全30問）</h1>
+  <div class="progress" id="progress">第1問 / 30問</div>
+  
   <div id="quiz-container">
     <div class="question-box">
-      <div id="question-text" class="question-text">ここに問題が表示されます</div>
+      <div id="question-text" class="question-text">読み込み中...</div>
       <div id="options" class="options"></div>
     </div>
     <div id="result-msg" class="result-msg"></div>
@@ -107,65 +138,257 @@
 </div>
 
 <script>
-// プリントの内容に基づいた問題データ
-const questions = [
+// 問題データ（全30問）
+const sourceQuestions = [
+  // --- 感染症の基礎 ---
   {
-    q: "感染してから症状が出るまでの期間を何というか？",
-    options: ["潜伏期間", "治療期間", "免疫期間", "隔離期間"],
+    q: "病原体が体内に入り、増殖することを何というか？",
+    options: ["感染", "発症", "潜伏", "保菌"],
     a: 0,
-    note: "「感染＝発症」ではありません。ウイルスが増殖するまでの時間を潜伏期間といいます。"
+    note: "病原体が体に入るだけでなく、「増殖」することで感染が成立します。"
   },
   {
-    q: "かつて減少し制圧されたかに見えたが、再び流行し始めた感染症（結核など）を何というか？",
-    options: ["新興感染症", "再興感染症", "生活習慣病", "日和見感染"],
-    a: 1,
-    note: "新興感染症は新しく発見されたもの（COVID-19など）。再興感染症は再び増え始めたものです。"
+    q: "感染してから特有の病的症状が出るまでの期間を何というか？",
+    options: ["潜伏期間", "治療期間", "免疫獲得期", "回復期"],
+    a: 0,
+    note: "「感染＝発症」ではありません。症状が出るまでのタイムラグを潜伏期間といいます。"
   },
   {
-    q: "治療の過程で、薬が効かなくなってしまった菌のことを何というか？",
-    options: ["病原性細菌", "薬剤耐性菌", "常在菌", "獲得免疫菌"],
-    a: 1,
-    note: "薬を正しく飲みきらないと、生き残った菌が薬に強くなり「薬剤耐性菌」になることがあります。"
+    q: "日本では1950年頃を境に、死因の第1位はどう変化したか？",
+    options: ["感染症から生活習慣病へ", "生活習慣病から感染症へ", "感染症から事故へ", "変化していない"],
+    a: 0,
+    note: "かつては結核などの感染症が中心でしたが、現在はがん・心臓病などの生活習慣病が中心です。"
+  },
+  
+  // --- 感染症の種類 ---
+  {
+    q: "エイズ、O157、SARS、COVID-19など、新しく注目されるようになった感染症を何というか？",
+    options: ["新興感染症", "再興感染症", "輸入感染症", "動物由来感染症"],
+    a: 0,
+    note: "新しく発見された未知の感染症を「新興感染症」と呼びます。"
   },
   {
-    q: "感染症予防の3原則のうち、消毒や殺菌などで病原体をなくす対策はどれか？",
+    q: "結核やマラリアのように、一時期は減ったが再び流行し始めた感染症を何というか？",
+    options: ["再興感染症", "新興感染症", "慢性感染症", "風土病"],
+    a: 0,
+    note: "再び（Re）興る、という意味で「再興感染症」です。"
+  },
+  {
+    q: "治療の過程で医薬品に対して抵抗力を持ってしまい、薬が効かなくなった菌を何というか？",
+    options: ["薬剤耐性菌", "ウイルス変異株", "日和見菌", "常在菌"],
+    a: 0,
+    note: "抗生物質を途中でやめるなどで発生しやすくなります。プリントの書き込みにある重要語句です。"
+  },
+  {
+    q: "感染症が世界規模で一気に広がるようになった主な社会的要因は？",
+    options: ["交通網の発達によるグローバル化", "地球温暖化", "医療技術の低下", "人口の減少"],
+    a: 0,
+    note: "航空機などで人や物が短時間で移動できるようになったためです。"
+  },
+
+  // --- 予防の3原則 ---
+  {
+    q: "感染症予防の3原則のうち、消毒や殺菌、隔離などで病原体をなくす対策は？",
     options: ["感染源対策", "感染経路対策", "感受性対策", "免疫対策"],
     a: 0,
-    note: "手洗いやマスクは「経路対策」、予防接種は「感受性対策」です。"
+    note: "病原体そのもの（感染源）を断つ対策です。"
   },
   {
-    q: "HIV（エイズウイルス）が破壊する、免疫の司令塔となる細胞はどれか？",
-    options: ["赤血球", "ヘルパーT細胞", "血小板", "B細胞"],
-    a: 1,
-    note: "ヘルパーT細胞が壊されると、普段なら何ともない弱い菌で病気になる（日和見感染）状態になります。"
+    q: "感染症予防の3原則のうち、手洗い・うがい・マスク・換気などはどれにあたるか？",
+    options: ["感染経路対策", "感染源対策", "感受性対策", "治療対策"],
+    a: 0,
+    note: "病原体が体に入ってくるルートを遮断する対策です。"
   },
   {
-    q: "エイズの感染経路として正しくない（感染しない）ものはどれか？",
-    options: ["性行為", "血液感染", "母子感染", "蚊に刺される"],
-    a: 3,
-    note: "エイズは、蚊、握手、咳、プール、同じ食器の使用などでは感染しません。"
+    q: "感染症予防の3原則のうち、予防接種を受けたり栄養・睡眠をとる対策は？",
+    options: ["感受性対策", "感染経路対策", "感染源対策", "環境対策"],
+    a: 0,
+    note: "体の抵抗力（免疫）を高めて、病気にかかりにくくする対策です。"
   },
   {
-    q: "生活習慣病の予防のうち、早期発見・早期治療（健康診断など）を何というか？",
-    options: ["一次予防", "二次予防", "三次予防", "四次予防"],
-    a: 1,
-    note: "一次予防は発病防止（運動・食事）、三次予防はリハビリ・社会復帰です。"
+    q: "生まれつき備わっている免疫（皮膚や粘膜など）を何というか？",
+    options: ["自然免疫", "獲得免疫", "集団免疫", "人工免疫"],
+    a: 0,
+    note: "対して、感染したりワクチンで得たりする免疫を「獲得免疫」といいます。"
+  },
+
+  // --- 性感染症・エイズ ---
+  {
+    q: "性感染症（STI）の特徴として正しいものは？",
+    options: ["自覚症状がないことが多い", "一度かかれば二度とかからない", "必ず高熱が出る", "自然に治ることが多い"],
+    a: 0,
+    note: "特に女性は症状が出にくいことが多く、気づかないうちにパートナーに感染させる危険があります。"
   },
   {
-    q: "健康づくりのために、1日に摂取することが目標とされている野菜の量は？",
-    options: ["100g", "280g", "350g", "500g"],
-    a: 2,
-    note: "現在の平均は約280gで不足しており、「プラス一皿（約70g）」で350gを目指すのが目標です。"
+    q: "HIV（ヒト免疫不全ウイルス）が破壊する、免疫の司令塔となる細胞は？",
+    options: ["ヘルパーT細胞", "キラーT細胞", "B細胞", "マクロファージ"],
+    a: 0,
+    note: "プリントの書き込みにある重要語句です。ここが壊れると免疫機能全体が低下します。"
+  },
+  {
+    q: "免疫力が低下し、健康な人なら感染しないような弱い菌で病気になることを何というか？",
+    options: ["日和見感染", "院内感染", "垂直感染", "空気感染"],
+    a: 0,
+    note: "日和見（ひよりみ）感染といいます。これがエイズ発症の特徴です。"
+  },
+  {
+    q: "エイズの感染経路として【誤っている（感染しない）】ものは？",
+    options: ["蚊に刺される", "性的接触", "血液感染", "母子感染"],
+    a: 0,
+    note: "蚊、握手、咳、プール、同じ食器の使用などでは感染しません。"
+  },
+  {
+    q: "HIVに感染してから抗体ができるまでには時間がかかるため、検査は感染の疑いがある日からどれくらい空ける必要があるか？",
+    options: ["3ヶ月（12週間）以上", "3日後すぐ", "1週間程度", "1年後"],
+    a: 0,
+    note: "「ウインドウ期」と呼ばれ、早すぎると正しい結果が出ないことがあります。"
+  },
+  {
+    q: "世界エイズデーはいつか？",
+    options: ["12月1日", "1月1日", "6月1日", "10月10日"],
+    a: 0,
+    note: "プリントに記載があります。シンボルマークはレッドリボンです。"
+  },
+
+  // --- 生活習慣病 ---
+  {
+    q: "生活習慣病に含まれないものはどれか？",
+    options: ["インフルエンザ", "心臓病", "脳卒中", "歯周病"],
+    a: 0,
+    note: "インフルエンザは感染症です。生活習慣病はがん・糖尿病なども含みます。"
+  },
+  {
+    q: "内臓脂肪型肥満に加え、高血糖・高血圧・脂質異常のうち2つ以上を併せ持った状態を何というか？",
+    options: ["メタボリックシンドローム", "ロコモティブシンドローム", "エコノミークラス症候群", "バーンアウト"],
+    a: 0,
+    note: "いわゆる「メタボ」のことです。動脈硬化が進みやすくなります。"
+  },
+  {
+    q: "生活習慣病の予防のうち、発病そのものを防ぐ（食事・運動・禁煙など）ことを何というか？",
+    options: ["一次予防", "二次予防", "三次予防", "初期予防"],
+    a: 0,
+    note: "最も基本的で重要な予防です。"
+  },
+  {
+    q: "生活習慣病の予防のうち、「健康診断」などで早期発見・早期治療することを何というか？",
+    options: ["二次予防", "一次予防", "三次予防", "末期予防"],
+    a: 0,
+    note: "病気を早く見つけて治す段階です。"
+  },
+  {
+    q: "生活習慣病の予防のうち、重症化した後のリハビリテーションや社会復帰支援を何というか？",
+    options: ["三次予防", "一次予防", "二次予防", "回復予防"],
+    a: 0,
+    note: "再発防止や機能回復を目指す段階です。"
+  },
+
+  // --- 運動・健康 ---
+  {
+    q: "運動がもたらす精神的な効果として適切なものは？",
+    options: ["ストレスの解消（メンタルヘルス）", "骨密度の増加", "心肺機能の向上", "肥満の解消"],
+    a: 0,
+    note: "骨や心肺機能などは「身体的」効果です。運動は心の健康にも重要です。"
+  },
+  {
+    q: "運動を行う際の注意点として適切でないものは？",
+    options: ["限界まで無理をして行う", "個人の体力に合わせる", "継続して行う", "体調に合わせて調整する"],
+    a: 0,
+    note: "無理をすると怪我の原因になります。「無理なく継続」が大切です。"
+  },
+
+  // --- 食生活・栄養 ---
+  {
+    q: "朝食を抜くと起こりやすい体の状態は？",
+    options: ["体温が上がらず、集中力が低下する", "脂肪が燃焼しやすくなる", "一日中元気に過ごせる", "筋肉が増えやすくなる"],
+    a: 0,
+    note: "脳のエネルギー不足になるほか、体が飢餓状態と感じて逆に太りやすくなります。"
+  },
+  {
+    q: "健康づくりのために目標とされる、1日の野菜摂取量は？",
+    options: ["350g", "100g", "500g", "1kg"],
+    a: 0,
+    note: "現状の平均は約280g。「プラス一皿（約70g）」を意識しましょう。"
+  },
+  {
+    q: "栄養バランスの良い食事のために揃えるべき3つの要素は？",
+    options: ["主食・主菜・副菜", "ご飯・パン・麺", "肉・魚・卵", "朝・昼・晩"],
+    a: 0,
+    note: "エネルギー源の「主食」、体を作る「主菜」、調子を整える「副菜」です。"
+  },
+  {
+    q: "サプリメント（栄養補助食品）の使用について正しい考え方は？",
+    options: ["あくまで食事の補助として考える", "食事の代わりにこれだけ飲めば良い", "たくさん飲めば健康になる", "病気が必ず治る"],
+    a: 0,
+    note: "基本は食事から栄養を摂り、不足分を補うのがサプリメントです。"
+  },
+  
+  // --- その他重要語句 ---
+  {
+    q: "WHOは何の略称か？",
+    options: ["世界保健機関", "国際労働機関", "世界貿易機関", "国連児童基金"],
+    a: 0,
+    note: "World Health Organization。感染症対策などで中心的な役割を果たします。"
+  },
+  {
+    q: "がん検診や健康診断を定期的に受けることは、何次予防にあたるか？",
+    options: ["二次予防", "一次予防", "三次予防", "四次予防"],
+    a: 0,
+    note: "早期発見・早期治療のための「二次予防」です。"
   }
 ];
 
+// 配列をシャッフルする関数
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// 選択肢をシャッフルする関数（正解の位置をランダムにする）
+function prepareQuestions(data) {
+  return data.map(item => {
+    // 選択肢と正解のペアを作る
+    const originalOptions = item.options.map((opt, index) => ({ text: opt, isCorrect: index === item.a }));
+    // ペアをシャッフル
+    const shuffledOptions = shuffleArray([...originalOptions]);
+    // 新しい正解インデックスを探す
+    const newAnswerIndex = shuffledOptions.findIndex(opt => opt.isCorrect);
+    
+    return {
+      q: item.q,
+      options: shuffledOptions.map(opt => opt.text),
+      a: newAnswerIndex,
+      note: item.note
+    };
+  });
+}
+
+// ゲームの状態管理
+let quizData = [];
 let currentQIndex = 0;
 let isAnswered = false;
 
+function initQuiz() {
+  // 問題順をシャッフルし、選択肢もランダム化してセット
+  const shuffledSource = shuffleArray([...sourceQuestions]);
+  quizData = prepareQuestions(shuffledSource);
+  currentQIndex = 0;
+  isAnswered = false;
+  
+  document.getElementById("next-btn").textContent = "次の問題へ";
+  renderQuestion();
+}
+
 function renderQuestion() {
   isAnswered = false;
-  const qData = questions[currentQIndex];
-  document.getElementById("question-text").textContent = `Q${currentQIndex + 1}. ${qData.q}`;
+  const qData = quizData[currentQIndex];
+  
+  // 進捗表示
+  document.getElementById("progress").textContent = `第${currentQIndex + 1}問 / ${quizData.length}問`;
+  
+  document.getElementById("question-text").textContent = `Q. ${qData.q}`;
   const optionsDiv = document.getElementById("options");
   optionsDiv.innerHTML = "";
   document.getElementById("result-msg").style.display = "none";
@@ -182,30 +405,38 @@ function renderQuestion() {
 function checkAnswer(selectedIndex, btnElement) {
   if (isAnswered) return;
   isAnswered = true;
-  const qData = questions[currentQIndex];
+  const qData = quizData[currentQIndex];
   const resultMsg = document.getElementById("result-msg");
   
   const buttons = document.querySelectorAll(".options button");
-  buttons[qData.a].classList.add("correct"); // 正解を表示
+  
+  // 正解ボタンを緑にする
+  buttons[qData.a].classList.add("correct");
 
   if (selectedIndex === qData.a) {
-    btnElement.classList.add("correct");
-    resultMsg.innerHTML = `<div style="color:green">◎ 正解！</div><div class="explanation">${qData.note}</div>`;
+    // 正解の場合
+    if(btnElement) btnElement.classList.add("correct"); // すでにクラス追加済みだが念のため
+    resultMsg.innerHTML = `<div class="result-title" style="color:#155724">◎ 正解！</div><div class="explanation">${qData.note}</div>`;
+    resultMsg.style.backgroundColor = "#d4edda";
+    resultMsg.style.borderLeftColor = "#28a745";
   } else {
+    // 不正解の場合
     btnElement.classList.add("wrong");
-    resultMsg.innerHTML = `<div style="color:red">× 不正解...</div><div class="explanation">正解は「${qData.options[qData.a]}」です。<br>${qData.note}</div>`;
+    resultMsg.innerHTML = `<div class="result-title" style="color:#721c24">× 不正解...</div><div class="explanation">正解は「${qData.options[qData.a]}」です。<br>${qData.note}</div>`;
+    resultMsg.style.backgroundColor = "#f8d7da";
+    resultMsg.style.borderLeftColor = "#dc3545";
   }
   
   resultMsg.style.display = "block";
   
-  // 最後の問題でなければ「次へ」ボタンを表示
-  if (currentQIndex < questions.length - 1) {
-    document.getElementById("next-btn").style.display = "block";
+  // 次へボタンの制御
+  const nextBtn = document.getElementById("next-btn");
+  if (currentQIndex < quizData.length - 1) {
+    nextBtn.style.display = "block";
   } else {
-    const finishBtn = document.getElementById("next-btn");
-    finishBtn.textContent = "最初からやり直す";
-    finishBtn.onclick = () => location.reload();
-    finishBtn.style.display = "block";
+    nextBtn.textContent = "最初からやり直す（シャッフル）";
+    nextBtn.onclick = () => initQuiz();
+    nextBtn.style.display = "block";
   }
 }
 
@@ -214,8 +445,8 @@ function nextQuestion() {
   renderQuestion();
 }
 
-// 初期表示
-renderQuestion();
+// 開始
+initQuiz();
 
 </script>
 </body>
