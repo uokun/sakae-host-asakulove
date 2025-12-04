@@ -3,491 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数学I 週末課題 全解き方ガイド</title>
+    <title>数学I 解き方確認クイズ</title>
     <style>
         body {
             font-family: "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.6;
+            background-color: #f0f4f8;
             color: #333;
-            max-width: 900px;
-            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
             padding: 20px;
-            background-color: #f0f2f5;
         }
         h1 {
-            text-align: center;
             color: #2c3e50;
-            margin-bottom: 30px;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
         }
-        .nav-buttons {
+        .quiz-container {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 30px;
+            flex-direction: column;
+            position: relative;
+            min-height: 400px;
         }
-        .nav-btn {
+        .category-badge {
+            position: absolute;
+            top: 15px;
+            left: 20px;
             background-color: #3498db;
             color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
             font-weight: bold;
-            transition: background 0.3s;
         }
-        .nav-btn:hover {
-            background-color: #2980b9;
-        }
-        .sheet-section {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            scroll-margin-top: 20px;
-        }
-        .sheet-title {
-            font-size: 1.5em;
+        .question-area {
+            padding: 60px 30px 30px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
             color: #2c3e50;
-            border-bottom: 3px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            border-bottom: 2px dashed #eee;
         }
-        .problem-group {
+        .answer-area {
+            background-color: #fcfcfc;
+            padding: 30px;
+            display: none; /* 初期状態は非表示 */
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .answer-area.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+        .answer-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #e74c3c;
+            font-weight: bold;
             margin-bottom: 15px;
         }
-        details {
-            background-color: #f9f9f9;
-            border: 1px solid #e1e1e1;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            overflow: hidden;
+        .answer-detail {
+            font-size: 0.95rem;
+            color: #555;
+            text-align: left;
+            width: 100%;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
         }
-        summary {
-            padding: 12px 15px;
-            cursor: pointer;
-            font-weight: bold;
-            background-color: #fff;
+        .btn-container {
+            padding: 20px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            list-style: none;
+            gap: 10px;
+            justify-content: center;
+            background: white;
         }
-        summary::-webkit-details-marker {
+        button {
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            width: 100%;
+            max-width: 250px;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        #show-btn {
+            background-color: #3498db;
+            color: white;
+        }
+        #show-btn:hover {
+            background-color: #2980b9;
+        }
+        #next-btn {
+            background-color: #2ecc71;
+            color: white;
             display: none;
         }
-        summary:after {
-            content: "+";
-            font-weight: bold;
-            color: #3498db;
-            font-size: 1.2em;
+        #next-btn:hover {
+            background-color: #27ae60;
         }
-        details[open] summary:after {
-            content: "-";
-            color: #e74c3c;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        summary:hover {
-            background-color: #f1f8ff;
-        }
-        .content {
-            padding: 15px;
-            border-top: 1px solid #eee;
-            background-color: #fafafa;
-        }
-        .step {
-            margin-bottom: 12px;
-            padding-left: 12px;
-            border-left: 4px solid #3498db;
-        }
-        .step strong {
-            display: block;
-            color: #2980b9;
-            margin-bottom: 4px;
-        }
-        .formula {
-            background: #eee;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-family: monospace;
-            font-weight: bold;
-        }
-        .warn {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .tag {
-            display: inline-block;
-            background: #95a5a6;
-            color: white;
-            font-size: 0.8em;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-right: 8px;
-            vertical-align: middle;
+        .progress {
+            margin-top: 10px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
-    <h1>数学I 週末課題 解き方コンプリートガイド</h1>
+    <h1>数学I 解き方・手順クイズ</h1>
 
-    <!-- ナビゲーション -->
-    <div class="nav-buttons">
-        <a href="#sheet001" class="nav-btn">【001】2次関数・方程式</a>
-        <a href="#sheet002" class="nav-btn">【002】判別式・グラフ</a>
-        <a href="#sheet003" class="nav-btn">【003】不等式計算</a>
-        <a href="#sheet004" class="nav-btn">【004】不等式応用</a>
-        <a href="#sheet005" class="nav-btn">【005】三角比(sin cos)</a>
-    </div>
+    <div class="quiz-container">
+        <div class="category-badge" id="category">カテゴリ</div>
+        
+        <div class="question-area" id="question">
+            ここに問題が表示されます
+        </div>
 
-    <!-- ========================================== -->
-    <!-- 課題005 -->
-    <!-- ========================================== -->
-    <div id="sheet005" class="sheet-section">
-        <div class="sheet-title">課題【005】三角比 (sin, cos, tan)</div>
+        <div class="answer-area" id="answer-area">
+            <div class="answer-text" id="answer-main">ここに答えの核が表示されます</div>
+            <div class="answer-detail" id="answer-sub">ここに詳しい手順が表示されます</div>
+        </div>
 
-        <div class="problem-group">
-            <details>
-                <summary><span class="tag">問1</span>直角三角形のsin, cos, tanの求め方</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>1. 辺の名前を確認する</strong>
-                        斜辺（一番長い）、底辺（角度θの隣）、対辺（角度θの向かい）を確認します。
-                    </div>
-                    <div class="step">
-                        <strong>2. 公式に当てはめる</strong>
-                        <ul>
-                            <li>sinθ = <span class="formula">対辺 / 斜辺</span> (Sの筆記体)</li>
-                            <li>cosθ = <span class="formula">底辺 / 斜辺</span> (Cの字)</li>
-                            <li>tanθ = <span class="formula">対辺 / 底辺</span> (tの筆記体)</li>
-                        </ul>
-                    </div>
-                    <div class="step">
-                        <strong>※辺の長さが足りない時</strong>
-                        三平方の定理 <span class="formula">a² + b² = c²</span> で計算して出してから公式を使います。
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary><span class="tag">問3-4</span>三角比の表の使い方</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>値を求める場合 (sin 12°など)</strong>
-                        教科書の巻末などにある表の「角度」の列から12°を探し、横に見てsinの列の数字を答えます。
-                    </div>
-                    <div class="step">
-                        <strong>角度を求める場合 (sinθ = 0.4など)</strong>
-                        表のsinの列の中から、0.4に一番近い数字を探し、その左にある「角度」を答えます。
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary><span class="tag">問5</span>辺の長さを式で表す</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>「分母」を払うイメージ</strong>
-                        たとえば <span class="formula">cos A = AC / AB</span> なら、両辺にABを掛けて <span class="formula">AC = AB × cos A</span> となります。
-                    </div>
-                    <div class="step">
-                        <strong>基本パターン</strong>
-                        <ul>
-                            <li>底辺 = 斜辺 × cosθ</li>
-                            <li>高さ = 斜辺 × sinθ</li>
-                            <li>高さ = 底辺 × tanθ</li>
-                        </ul>
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary><span class="tag">問6-7</span>文章題（坂道・鉄塔）</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>図を描く</strong>
-                        直角三角形を描き、わかっている長さと角度を書き込みます。
-                    </div>
-                    <div class="step">
-                        <strong>どの比を使うか選ぶ</strong>
-                        <ul>
-                            <li>斜めの距離から水平距離を出したい → <strong>cos</strong></li>
-                            <li>水平距離から高さ（ビルや木）を出したい → <strong>tan</strong></li>
-                        </ul>
-                    </div>
-                    <div class="step">
-                        <strong>注意点：目の高さ</strong>
-                        「目の高さ」が与えられている場合、tanで計算した高さに<span class="warn">最後に目の高さを足す</span>のを忘れないでください。
-                    </div>
-                </div>
-            </details>
+        <div class="btn-container">
+            <button id="show-btn">答えを見る</button>
+            <button id="next-btn">次の問題へ</button>
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 課題004 -->
-    <!-- ========================================== -->
-    <div id="sheet004" class="sheet-section">
-        <div class="sheet-title">課題【004】不等式の応用</div>
+    <div class="progress" id="counter">第 1 問</div>
 
-        <div class="problem-group">
-            <details>
-                <summary><span class="tag">問1</span>実数解をもつ・もたない条件</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>判別式 D を計算する</strong>
-                        <span class="formula">D = b² - 4ac</span> をmを使って表します。
-                    </div>
-                    <div class="step">
-                        <strong>条件に合わせて不等式を解く</strong>
-                        <ul>
-                            <li>「実数解をもつ」 → <span class="formula">D ≧ 0</span> を解く</li>
-                            <li>「実数解をもたない」 → <span class="formula">D < 0</span> を解く</li>
-                        </ul>
-                    </div>
-                </div>
-            </details>
+    <script>
+        // クイズデータ（解き方の確認）
+        const quizData = [
+            // --- 2次関数 (基本・決定) ---
+            {
+                category: "2次関数の決定",
+                question: "「頂点が(2, -1)で...」という問題。<br>どの式に代入してスタートする？",
+                answer: "y = a(x - p)² + q",
+                detail: "頂点 (p, q) がわかっている時は基本形を使います。<br>式を <strong>y = a(x - 2)² - 1</strong> と置いて、通る点の座標を代入して a を求めます。"
+            },
+            {
+                category: "2次関数の決定",
+                question: "「3点 (1,2), (3,5), (-1,4) を通る...」という問題。<br>どの式を使う？",
+                answer: "y = ax² + bx + c",
+                detail: "頂点や軸の情報がない時は一般形を使います。<br>3つの点をすべて代入して、a, b, c の連立方程式（3文字）を作って解きます。"
+            },
+            {
+                category: "2次関数の決定",
+                question: "a, b, c の連立方程式。<br>一番最初に消去すべき文字はどれ？",
+                answer: "文字 c を消す！",
+                detail: "c は係数が全部 1 なので一番消しやすいです。<br>(1)-(2) と (2)-(3) の引き算をして、aとbだけの式を2つ作るのが鉄則です。"
+            },
+            
+            // --- 2次方程式・判別式 ---
+            {
+                category: "2次方程式",
+                question: "「方程式が重解をもつとき...」<br>計算すべき式は？",
+                answer: "判別式 D = 0",
+                detail: "D = b² - 4ac を計算して、それが <strong>= 0</strong> になるように方程式を立てます。"
+            },
+            {
+                category: "2次方程式",
+                question: "「x軸との共有点の個数を求めよ」<br>何をする？",
+                answer: "判別式 D の符号（プラス・マイナス）を調べる",
+                detail: "方程式を解く必要はありません。<br>・D > 0 なら 2個<br>・D = 0 なら 1個<br>・D < 0 なら 0個"
+            },
+            {
+                category: "2次方程式",
+                question: "「x軸と共有点をもたないとき」<br>Dの条件は？",
+                answer: "D < 0",
+                detail: "解がない（交わらない）ので、判別式はマイナスになります。"
+            },
 
-            <details>
-                <summary><span class="tag">問2</span>「すべての実数」で成り立つ不等式</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>グラフが浮いている条件</strong>
-                        「常に > 0」であるためには、グラフがx軸と交わってはいけません。
-                    </div>
-                    <div class="step">
-                        <strong>計算式</strong>
-                        <span class="formula">D < 0</span> （判別式がマイナス）を解きます。<br>
-                        ※「グラフは上にあるのに、判別式は0より小さい」という点に注意！交点がない＝解がない＝Dが負、です。
-                    </div>
-                </div>
-            </details>
+            // --- グラフとx軸 ---
+            {
+                category: "グラフ",
+                question: "「放物線と直線の共有点の座標」<br>最初のステップは？",
+                answer: "右辺同士をイコールで結ぶ",
+                detail: "放物線の式 ＝ 直線の式 という形を作ります。<br>全部左辺に移項して2次方程式を解けば、交点のx座標が出ます。"
+            },
+            {
+                category: "グラフ",
+                question: "「x軸に接する放物線を選べ」<br>どうやって見分ける？",
+                answer: "2次方程式の解が「重解（1つ）」になるもの",
+                detail: "(x+○)² = 0 の形に変形できるものが「接する」グラフです。<br>判別式 D = 0 になるものを選んでもOKです。"
+            },
 
-            <details>
-                <summary><span class="tag">問3</span>連立不等式</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>1. 別々に解く</strong>
-                        上と下の不等式をそれぞれ解いて、xの範囲を出します。
-                    </div>
-                    <div class="step">
-                        <strong>2. 数直線を描く</strong>
-                        2つの範囲を数直線に描き込みます。
-                    </div>
-                    <div class="step">
-                        <strong>3. 重なっている部分を答える</strong>
-                        両方の線が重なっている範囲が答えです。
-                    </div>
-                </div>
-            </details>
+            // --- 2次不等式 ---
+            {
+                category: "2次不等式",
+                question: "-x² + 4x + 5 > 0 <br>一番最初にやることは？",
+                answer: "両辺に -1 を掛けて不等号を逆にする！",
+                detail: "x² の前にあるマイナスは計算ミスの元です。<br><strong>x² - 4x - 5 < 0</strong> に直してから解きます。"
+            },
+            {
+                category: "2次不等式",
+                question: "(x - 1)(x - 3) > 0 <br>解の範囲は「内側」？「外側」？",
+                answer: "外側",
+                detail: "式 > 0 （大きい）ときは、解の外側になります。<br>答え： x < 1,  3 < x"
+            },
+            {
+                category: "2次不等式",
+                question: "(x - 2)² ≦ 0 <br>これの解はどうなる？",
+                answer: "x = 2 だけ",
+                detail: "2乗して0以下になるのは、0になる瞬間しかありません。<br>よって x=2 の一点のみが答えです。"
+            },
+            {
+                category: "2次不等式",
+                question: "すべての実数 x で成り立つ条件<br>（グラフが常に浮いている）",
+                answer: "D < 0",
+                detail: "「常に成り立つ」＝「x軸と交わらない」ということ。<br>交わらないので判別式 D はマイナスになります。"
+            },
 
-            <details>
-                <summary><span class="tag">問5</span>正方形の切り取り（文章題）</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>1. 変域（定義域）の確認</strong>
-                        「辺の長さ」は必ずプラスです。<br>
-                        <span class="formula">12 - 2x > 0</span> などから、まずxの限界（0 < x < 6など）をメモしておきます。
-                    </div>
-                    <div class="step">
-                        <strong>2. 不等式を立てる</strong>
-                        問題文通りに「面積 ≧ 40」などの式を作り、整理して解きます。
-                    </div>
-                    <div class="step">
-                        <strong>3. 共通範囲をとる</strong>
-                        計算して出た答えと、最初の変域の「重なっている部分」が最終的な答えです。
-                    </div>
-                </div>
-            </details>
+            // --- 三角比 ---
+            {
+                category: "三角比",
+                question: "直角三角形の斜辺と「底辺」を使う三角比は？<br>（sin, cos, tan のどれ？）",
+                answer: "cos (コサイン)",
+                detail: "cos θ = 底辺 / 斜辺 です。<br>斜辺と底辺で挟むように C を書くのが覚え方です。"
+            },
+            {
+                category: "三角比",
+                question: "「ある地点からビルの頂上を見上げた」<br>高さを求める時に使うのは？",
+                answer: "tan (タンジェント)",
+                detail: "水平距離と高さの関係なので tan を使います。<br>高さ = 水平距離 × tanθ"
+            },
+            {
+                category: "三角比",
+                question: "目の高さがある問題で、最後に忘れてはいけないことは？",
+                answer: "計算結果に「目の高さ」を足す！",
+                detail: "tanで求まるのは「目から上」の高さだけです。<br>最後に身長（目の高さ）を足さないと正解になりません。"
+            }
+        ];
 
-            <details>
-                <summary><span class="tag">問6</span>解の配置（正の部分で2点交わる）</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>3つの条件をすべて満たす範囲を探す</strong>
-                        難問ですが、手順は決まっています。
-                        <ol>
-                            <li><strong>判別式 D > 0</strong> （2点で交わるため）</li>
-                            <li><strong>軸 > 0</strong> （山頂が右側にあるため）</li>
-                            <li><strong>f(0) > 0</strong> （y切片がプラスであるため）</li>
-                        </ol>
-                        この3つの不等式を連立させます。
-                    </div>
-                </div>
-            </details>
-        </div>
-    </div>
+        // 変数
+        let currentQuizIndex = 0;
+        let shuffledQuiz = [];
 
-    <!-- ========================================== -->
-    <!-- 課題003 -->
-    <!-- ========================================== -->
-    <div id="sheet003" class="sheet-section">
-        <div class="sheet-title">課題【003】2次不等式 計算ドリル</div>
+        // 要素の取得
+        const categoryEl = document.getElementById("category");
+        const questionEl = document.getElementById("question");
+        const answerArea = document.getElementById("answer-area");
+        const answerMain = document.getElementById("answer-main");
+        const answerSub = document.getElementById("answer-sub");
+        const showBtn = document.getElementById("show-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const counterEl = document.getElementById("counter");
 
-        <div class="problem-group">
-            <details>
-                <summary><span class="tag">問1,4,8</span>基本的な解き方・x²にマイナスがある時</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>最初に必ずやること</strong>
-                        x²の係数がマイナスなら、両辺に-1を掛けます。<br>
-                        <span class="warn">この時、不等号の向きを逆にするのを絶対に忘れないこと！</span>
-                    </div>
-                    <div class="step">
-                        <strong>因数分解して範囲を決める</strong>
-                        <ul>
-                            <li><span class="formula">(x-α)(x-β) > 0</span> なら、外側 (x < α, β < x)</li>
-                            <li><span class="formula">(x-α)(x-β) < 0</span> なら、内側 (α < x < β)</li>
-                        </ul>
-                    </div>
-                </div>
-            </details>
+        // シャッフル関数
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
-            <details>
-                <summary><span class="tag">問2</span>( )² の形になる特殊なパターン</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>グラフがx軸に接している</strong>
-                        <span class="formula">(x-3)² ≧ 0</span> などの形です。グラフをイメージします。
-                    </div>
-                    <div class="step">
-                        <strong>答えのパターン</strong>
-                        <ul>
-                            <li><span class="formula">> 0</span> (浮いてる部分) → 頂点以外のすべての実数</li>
-                            <li><span class="formula">≧ 0</span> (接するのもOK) → すべての実数</li>
-                            <li><span class="formula">< 0</span> (地下にある部分) → 存在しないので「解なし」</li>
-                            <li><span class="formula">≦ 0</span> (0だけOK) → x = 頂点の座標（1つだけ）</li>
-                        </ul>
-                    </div>
-                </div>
-            </details>
-        </div>
-    </div>
+        // クイズ初期化
+        function initQuiz() {
+            shuffledQuiz = shuffle([...quizData]); // データをコピーしてシャッフル
+            currentQuizIndex = 0;
+            showQuestion();
+        }
 
-    <!-- ========================================== -->
-    <!-- 課題002 -->
-    <!-- ========================================== -->
-    <div id="sheet002" class="sheet-section">
-        <div class="sheet-title">課題【002】判別式とグラフ</div>
+        // 問題表示
+        function showQuestion() {
+            const data = shuffledQuiz[currentQuizIndex];
+            
+            // 表示リセット
+            answerArea.classList.remove("show");
+            showBtn.style.display = "inline-block";
+            nextBtn.style.display = "none";
+            
+            // 内容セット
+            categoryEl.textContent = data.category;
+            questionEl.innerHTML = data.question;
+            answerMain.textContent = data.answer;
+            answerSub.innerHTML = data.detail;
+            counterEl.textContent = `第 ${currentQuizIndex + 1} 問 / 全 ${quizData.length} 問`;
+        }
 
-        <div class="problem-group">
-            <details>
-                <summary><span class="tag">問1</span>重解をもつ条件</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>判別式 D = 0 を解く</strong>
-                        重解＝解が1つ＝Dが0 です。<br>
-                        mの方程式として解き、出たmを元の式に戻してx（重解）を求めます。<br>
-                        重解は <span class="formula">x = -b / 2a</span> ですぐ求まります。
-                    </div>
-                </div>
-            </details>
+        // ボタンイベント
+        showBtn.addEventListener("click", () => {
+            answerArea.classList.add("show");
+            showBtn.style.display = "none";
+            nextBtn.style.display = "inline-block";
+        });
 
-            <details>
-                <summary><span class="tag">問2</span>x軸との共有点・接するもの</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>y = 0 を代入して計算</strong>
-                        ただの2次方程式として解きます。答えは座標なので <span class="formula">(3, 0)</span> のように書きます。
-                    </div>
-                    <div class="step">
-                        <strong>接するもの</strong>
-                        解が1つ（重解）になったものが「接しているグラフ」です。
-                    </div>
-                </div>
-            </details>
+        nextBtn.addEventListener("click", () => {
+            currentQuizIndex++;
+            if (currentQuizIndex < shuffledQuiz.length) {
+                showQuestion();
+            } else {
+                // 一周終了
+                if(confirm("全問終了！もう一度シャッフルしてやりますか？")) {
+                    initQuiz();
+                }
+            }
+        });
 
-            <details>
-                <summary><span class="tag">問3-4</span>共有点の個数・交わる条件</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>判別式 D の符号を見る</strong>
-                        <ul>
-                            <li>D > 0 → 共有点2個</li>
-                            <li>D = 0 → 共有点1個</li>
-                            <li>D < 0 → 共有点0個</li>
-                        </ul>
-                    </div>
-                </div>
-            </details>
+        // 開始
+        initQuiz();
 
-            <details>
-                <summary><span class="tag">問5</span>放物線と直線の交点</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>右辺同士をイコールで結ぶ</strong>
-                        <span class="formula">x²... = 2x...</span> のように式をつなげます。
-                    </div>
-                    <div class="step">
-                        <strong>移項して解く</strong>
-                        全部左に寄せて2次方程式を解けば、交点のx座標が出ます。<br>
-                        最後に直線の式にxを代入してy座標も出しましょう。
-                    </div>
-                </div>
-            </details>
-        </div>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- 課題001 -->
-    <!-- ========================================== -->
-    <div id="sheet001" class="sheet-section">
-        <div class="sheet-title">課題【001】2次関数の決定・計算</div>
-
-        <div class="problem-group">
-            <details>
-                <summary><span class="tag">問1</span>2次関数を求める（頂点・軸）</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>頂点(p, q)や軸がわかっている場合</strong>
-                        基本形 <span class="formula">y = a(x-p)² + q</span> を使います。<br>
-                        頂点の座標を代入し、残りの1点を通る（代入）ことでaを求めます。
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary><span class="tag">問3</span>3点を通る2次関数</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>一般形を使う</strong>
-                        頂点が不明なので <span class="formula">y = ax² + bx + c</span> を使います。
-                    </div>
-                    <div class="step">
-                        <strong>連立方程式を解く</strong>
-                        3つの点を代入して、a, b, cの連立方程式を作ります。<br>
-                        引き算をしてcを消去し、aとbの連立方程式に持ち込むのがコツです。
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary><span class="tag">問2</span>連立3元1次方程式</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>1文字を狙い撃ちで消す</strong>
-                        式が3つありますが、係数が「1」の文字（cなど）を消しやすいです。<br>
-                        (1)-(2) と (2)-(3) のように2ペア計算して、同じ文字を消します。
-                    </div>
-                </div>
-            </details>
-
-            <details>
-                <summary><span class="tag">問4-6</span>2次方程式の解き方優先順位</summary>
-                <div class="content">
-                    <div class="step">
-                        <strong>1. 因数分解</strong>
-                        たすき掛けなどができるなら一番速い。
-                    </div>
-                    <div class="step">
-                        <strong>2. 解の公式</strong>
-                        因数分解できなければ迷わず公式。<br>
-                        真ん中の係数が偶数なら、偶数公式（b'を使うやつ）を使うと約分不要で速いです。
-                    </div>
-                </div>
-            </details>
-        </div>
-    </div>
-
+    </script>
 </body>
 </html>
